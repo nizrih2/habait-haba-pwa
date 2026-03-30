@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+
+  <!-- PWA Meta Tags -->
+  <meta name="theme-color" content="#1B3F6B">
+  <meta name="mobile-web-app-capable" content="yes">
+
+  <!-- iOS Specific Meta Tags -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="הבית הבא">
+
+  <!-- iOS Icons -->
+  <link rel="apple-touch-icon" href="icons/icon-180x180.png">
+  <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57x57.png">
+  <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72x72.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="icons/icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="114x114" href="icons/icon-114x114.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144x144.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167x167.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180x180.png">
+
+  <!-- iOS Splash Screens -->
+  <meta name="apple-mobile-web-app-orientations" content="portrait">
+
+  <!-- Manifest -->
+  <link rel="manifest" href="manifest.json">
+
+  <title>הבית הבא</title>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: #1B3F6B;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    /* Status bar spacer for iOS standalone mode */
+    .status-bar {
+      height: var(--safe-top);
+      background: #1B3F6B;
+      width: 100%;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 1000;
+    }
+
+    /* Loading screen */
+    #splash {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: #1B3F6B;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      transition: opacity 0.4s ease;
+    }
+
+    #splash.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    #splash .logo {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 20px;
+    }
+
+    #splash h1 {
+      color: white;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    #splash p {
+      color: rgba(255,255,255,0.7);
+      font-size: 14px;
+      margin-bottom: 30px;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid rgba(255,255,255,0.2);
+      border-top-color: #D4A017;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* WebView container */
+    #webview-container {
+      position: fixed;
+      top: var(--safe-top);
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: white;
+    }
+
+    #webview-container iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Bottom navigation bar */
+    #bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 0;
+      padding-bottom: calc(8px + var(--safe-bottom));
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: #666;
+      font-size: 10px;
+      padding: 4px 12px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      transition: color 0.2s;
+    }
+
+    .nav-item.active {
+      color: #1B3F6B;
+    }
+
+    .nav-item svg {
+      width: 24px;
+      height: 24px;
+      margin-bottom: 2px;
+    }
+
+    .nav-item span {
+      font-weight: 500;
+    }
+
+    /* Pull to refresh indicator */
+    #pull-indicator {
+      position: fixed;
+      top: var(--safe-top);
+      left: 50%;
+      transform: translateX(-50%) translateY(-50px);
+      background: white;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 500;
+      transition: transform 0.3s;
+    }
+
+    #pull-indicator.visible {
+      transform: translateX(-50%) translateY(10px);
+    }
+  </style>
+</head>
+<body>
+  <!-- Status bar background -->
+  <div class="status-bar"></div>
+
+  <!-- Splash screen -->
+  <div id="splash">
+    <img src="icons/icon-120x120.png" alt="הבית הבא" class="logo">
+    <h1>הבית הבא</h1>
+    <p>מנוע התאמה קהילתי-דתי</p>
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Pull to refresh -->
+  <div id="pull-indicator">
+    <div class="spinner" style="width:24px;height:24px;border-width:2px;"></div>
+  </div>
+
+  <!-- Main content -->
+  <div id="webview-container">
+    <iframe
+      id="app-frame"
+      src="https://nizrih2.wpcomstaging.com"
+      allow="geolocation; microphone; camera"
+      sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation"
+      loading="eager"
+    ></iframe>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <div id="bottom-nav">
+    <button class="nav-item active" data-url="https://nizrih2.wpcomstaging.com" onclick="navigate(this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+      <span>בית</span>
+    </button>
+    <button class="nav-item" data-url="https://nizrih2.wpcomstaging.com/communities/" onclick="navigate(this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+      <span>קהילות</span>
+    </button>
+    <button class="nav-item" data-url="https://nizrih2.wpcomstaging.com/quiz/" onclick="navigate(this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
+      <span>שאלון</span>
+    </button>
+    <button class="nav-item" data-url="https://nizrih2.wpcomstaging.com/projects/" onclick="navigate(this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 11v10h6v-5h2v5h6V11L8 6l-7 5zm12 8h-2v-5H5v5H3v-7l5-3.5 5 3.5v7zm4-12.5h2V9h-2V6.5zm0 4h2V19h-2V10.5zm4-6h2V9h-2V4.5zm0 6h2V19h-2V10.5z"/></svg>
+      <span>פרויקטים</span>
+    </button>
+    <button class="nav-item" data-url="https://nizrih2.wpcomstaging.com/contact/" onclick="navigate(this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+      <span>צור קשר</span>
+    </button>
+  </div>
+
+  <script>
+    const frame = document.getElementById('app-frame');
+    const splash = document.getElementById('splash');
+    const navItems = document.querySelectorAll('.nav-item');
+    const bottomNav = document.getElementById('bottom-nav');
+
+    // Adjust iframe height for bottom nav
+    function adjustHeight() {
+      const navHeight = bottomNav.offsetHeight;
+      document.getElementById('webview-container').style.bottom = navHeight + 'px';
+    }
+
+    // Hide splash when loaded
+    frame.addEventListener('load', () => {
+      setTimeout(() => {
+        splash.classList.add('hidden');
+        adjustHeight();
+      }, 800);
+    });
+
+    // Fallback: hide splash after 5s
+    setTimeout(() => {
+      splash.classList.add('hidden');
+      adjustHeight();
+    }, 5000);
+
+    // Navigation
+    function navigate(el) {
+      const url = el.dataset.url;
+      frame.src = url;
+
+      // Update active state
+      navItems.forEach(item => item.classList.remove('active'));
+      el.classList.add('active');
+
+      // Show splash briefly
+      splash.classList.remove('hidden');
+    }
+
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(() => {
+        console.log('Service Worker registered');
+      });
+    }
+
+    // Adjust on resize
+    window.addEventListener('resize', adjustHeight);
+    adjustHeight();
+  </script>
+</body>
+</html>
