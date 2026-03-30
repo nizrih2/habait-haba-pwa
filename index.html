@@ -2,7 +2,7 @@
 <html lang="he" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
 
   <!-- PWA Meta Tags -->
   <meta name="theme-color" content="#1B3F6B">
@@ -15,19 +15,9 @@
 
   <!-- iOS Icons -->
   <link rel="apple-touch-icon" href="icons/icon-180x180.png">
-  <link rel="apple-touch-icon" sizes="57x57" href="icons/icon-57x57.png">
-  <link rel="apple-touch-icon" sizes="60x60" href="icons/icon-60x60.png">
-  <link rel="apple-touch-icon" sizes="72x72" href="icons/icon-72x72.png">
-  <link rel="apple-touch-icon" sizes="76x76" href="icons/icon-76x76.png">
-  <link rel="apple-touch-icon" sizes="114x114" href="icons/icon-114x114.png">
-  <link rel="apple-touch-icon" sizes="120x120" href="icons/icon-120x120.png">
-  <link rel="apple-touch-icon" sizes="144x144" href="icons/icon-144x144.png">
   <link rel="apple-touch-icon" sizes="152x152" href="icons/icon-152x152.png">
   <link rel="apple-touch-icon" sizes="167x167" href="icons/icon-167x167.png">
   <link rel="apple-touch-icon" sizes="180x180" href="icons/icon-180x180.png">
-
-  <!-- iOS Splash Screens -->
-  <meta name="apple-mobile-web-app-orientations" content="portrait">
 
   <!-- Manifest -->
   <link rel="manifest" href="manifest.json">
@@ -38,107 +28,315 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
+      --primary: #1B3F6B;
+      --gold: #D4A017;
+      --bg: #f5f5f5;
+      --card-bg: #ffffff;
+      --text: #1E1E1E;
+      --text-light: #666;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --nav-height: 60px;
+      --header-height: 56px;
     }
 
     html, body {
       height: 100%;
       width: 100%;
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      color: var(--text);
       overflow: hidden;
-      background: #1B3F6B;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* Status bar spacer for iOS standalone mode */
-    .status-bar {
-      height: var(--safe-top);
-      background: #1B3F6B;
-      width: 100%;
+    /* ===== HEADER ===== */
+    #header {
       position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 1000;
+      top: 0; left: 0; right: 0;
+      height: calc(var(--header-height) + var(--safe-top));
+      padding-top: var(--safe-top);
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 16px;
+      padding-right: 16px;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
 
-    /* Loading screen */
+    #header h1 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    #back-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 8px;
+      display: none;
+    }
+
+    #back-btn.visible { display: block; }
+
+    #header-title { flex: 1; text-align: center; }
+
+    #refresh-btn {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 8px;
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    #main {
+      position: fixed;
+      top: calc(var(--header-height) + var(--safe-top));
+      left: 0; right: 0;
+      bottom: calc(var(--nav-height) + var(--safe-bottom));
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      background: var(--bg);
+    }
+
+    /* ===== SPLASH ===== */
     #splash {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: #1B3F6B;
+      background: var(--primary);
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       z-index: 999;
-      transition: opacity 0.4s ease;
+      transition: opacity 0.5s ease;
     }
-
-    #splash.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    #splash .logo {
-      width: 100px;
-      height: 100px;
-      margin-bottom: 20px;
-    }
-
-    #splash h1 {
-      color: white;
-      font-size: 28px;
-      margin-bottom: 8px;
-    }
-
-    #splash p {
-      color: rgba(255,255,255,0.7);
-      font-size: 14px;
-      margin-bottom: 30px;
-    }
-
+    #splash.hidden { opacity: 0; pointer-events: none; }
+    #splash img { width: 100px; height: 100px; margin-bottom: 16px; }
+    #splash h2 { color: white; font-size: 28px; margin-bottom: 6px; }
+    #splash p { color: rgba(255,255,255,0.7); font-size: 14px; margin-bottom: 24px; }
     .spinner {
-      width: 36px;
-      height: 36px;
+      width: 32px; height: 32px;
       border: 3px solid rgba(255,255,255,0.2);
-      border-top-color: #D4A017;
+      border-top-color: var(--gold);
       border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ===== LOADING ===== */
+    #loading {
+      display: none;
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-light);
+    }
+    #loading.show { display: block; }
+    #loading .spinner {
+      margin: 0 auto 12px;
+      border-color: rgba(27,63,107,0.15);
+      border-top-color: var(--primary);
     }
 
-    @keyframes spin {
-      to { transform: rotate(360deg); }
+    /* ===== HERO BANNER ===== */
+    .hero {
+      background: linear-gradient(135deg, var(--primary) 0%, #2a5a9a 100%);
+      color: white;
+      padding: 28px 20px;
+      text-align: center;
     }
-
-    /* WebView container */
-    #webview-container {
-      position: fixed;
-      top: var(--safe-top);
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: white;
-    }
-
-    #webview-container iframe {
-      width: 100%;
-      height: 100%;
+    .hero h2 { font-size: 22px; margin-bottom: 8px; }
+    .hero p { font-size: 14px; opacity: 0.85; line-height: 1.5; }
+    .hero-btn {
+      display: inline-block;
+      margin-top: 16px;
+      padding: 12px 28px;
+      background: var(--gold);
+      color: var(--primary);
       border: none;
+      border-radius: 25px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
     }
 
-    /* Bottom navigation bar */
+    /* ===== SECTION ===== */
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      padding: 20px 16px 10px;
+      color: var(--primary);
+    }
+
+    /* ===== CARDS ===== */
+    .cards {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 0 16px 16px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .card:active { transform: scale(0.98); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+
+    .card-img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      background: #ddd;
+    }
+
+    .card-body {
+      padding: 14px 16px;
+    }
+
+    .card-body h3 {
+      font-size: 16px;
+      margin-bottom: 6px;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    .card-body p {
+      font-size: 13px;
+      color: var(--text-light);
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .card-tag {
+      display: inline-block;
+      background: rgba(27,63,107,0.08);
+      color: var(--primary);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 12px;
+      margin-top: 8px;
+    }
+
+    /* ===== HORIZONTAL SCROLL ===== */
+    .h-scroll {
+      display: flex;
+      gap: 12px;
+      overflow-x: auto;
+      padding: 0 16px 16px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+    .h-scroll::-webkit-scrollbar { display: none; }
+
+    .h-card {
+      flex: 0 0 260px;
+      scroll-snap-align: start;
+      background: var(--card-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+      cursor: pointer;
+    }
+
+    .h-card-img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      background: #ddd;
+    }
+
+    .h-card-body {
+      padding: 12px;
+    }
+    .h-card-body h4 {
+      font-size: 14px;
+      margin-bottom: 4px;
+      line-height: 1.3;
+    }
+    .h-card-body p {
+      font-size: 12px;
+      color: var(--text-light);
+      line-height: 1.4;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* ===== DETAIL PAGE ===== */
+    .detail-content {
+      padding: 20px 16px;
+      line-height: 1.7;
+      font-size: 15px;
+    }
+    .detail-content h1, .detail-content h2, .detail-content h3 {
+      color: var(--primary);
+      margin: 20px 0 10px;
+    }
+    .detail-content h1 { font-size: 22px; }
+    .detail-content h2 { font-size: 19px; }
+    .detail-content h3 { font-size: 17px; }
+    .detail-content img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 12px 0;
+    }
+    .detail-content a {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+    .detail-content ul, .detail-content ol {
+      padding-right: 24px;
+      margin: 10px 0;
+    }
+    .detail-content li { margin-bottom: 6px; }
+    .detail-content p { margin-bottom: 12px; }
+    .detail-content table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+    .detail-content th, .detail-content td {
+      border: 1px solid #e0e0e0;
+      padding: 8px;
+      text-align: right;
+    }
+    .detail-content th { background: var(--primary); color: white; }
+
+    .detail-hero {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    /* ===== BOTTOM NAV ===== */
     #bottom-nav {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+      bottom: 0; left: 0; right: 0;
+      height: calc(var(--nav-height) + var(--safe-bottom));
+      padding-bottom: var(--safe-bottom);
       background: white;
       border-top: 1px solid #e0e0e0;
       display: flex;
       justify-content: space-around;
       align-items: center;
-      padding: 8px 0;
-      padding-bottom: calc(8px + var(--safe-bottom));
       z-index: 100;
     }
 
@@ -146,154 +344,504 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      text-decoration: none;
-      color: #666;
+      color: #999;
       font-size: 10px;
-      padding: 4px 12px;
+      padding: 6px 8px;
       cursor: pointer;
       border: none;
       background: none;
       transition: color 0.2s;
     }
+    .nav-item.active { color: var(--primary); }
+    .nav-item svg { width: 22px; height: 22px; margin-bottom: 2px; }
+    .nav-item span { font-weight: 500; }
 
-    .nav-item.active {
-      color: #1B3F6B;
+    /* ===== ERROR STATE ===== */
+    .error-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-light);
     }
-
-    .nav-item svg {
-      width: 24px;
-      height: 24px;
-      margin-bottom: 2px;
-    }
-
-    .nav-item span {
-      font-weight: 500;
-    }
-
-    /* Pull to refresh indicator */
-    #pull-indicator {
-      position: fixed;
-      top: var(--safe-top);
-      left: 50%;
-      transform: translateX(-50%) translateY(-50px);
-      background: white;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      z-index: 500;
-      transition: transform 0.3s;
-    }
-
-    #pull-indicator.visible {
-      transform: translateX(-50%) translateY(10px);
+    .error-state h3 { font-size: 18px; margin-bottom: 8px; color: var(--text); }
+    .error-state button {
+      margin-top: 16px;
+      padding: 10px 24px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <!-- Status bar background -->
-  <div class="status-bar"></div>
 
-  <!-- Splash screen -->
+  <!-- Splash -->
   <div id="splash">
-    <img src="icons/icon-120x120.png" alt="הבית הבא" class="logo">
-    <h1>הבית הבא</h1>
+    <img src="icons/icon-120x120.png" alt="">
+    <h2>הבית הבא</h2>
     <p>מנוע התאמה קהילתי-דתי</p>
     <div class="spinner"></div>
   </div>
 
-  <!-- Pull to refresh -->
-  <div id="pull-indicator">
-    <div class="spinner" style="width:24px;height:24px;border-width:2px;"></div>
+  <!-- Header -->
+  <div id="header">
+    <button id="back-btn" onclick="goBack()">&#8594;</button>
+    <div id="header-title"><h1>הבית הבא</h1></div>
+    <button id="refresh-btn" onclick="refreshPage()">&#8635;</button>
   </div>
 
-  <!-- Main content -->
-  <div id="webview-container">
-    <iframe
-      id="app-frame"
-      src="https://nizrih2.wpcomstaging.com"
-      allow="geolocation; microphone; camera"
-      sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-top-navigation"
-      loading="eager"
-    ></iframe>
+  <!-- Main Content -->
+  <div id="main">
+    <div id="loading" class="show"><div class="spinner"></div><p>טוען...</p></div>
+    <div id="content"></div>
   </div>
 
   <!-- Bottom Navigation -->
   <div id="bottom-nav">
-    <button class="nav-item active" data-url="https://nizrih2.wpcomstaging.com" onclick="navigate(this)">
+    <button class="nav-item active" data-page="home" onclick="navTo('home', this)">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
       <span>בית</span>
     </button>
-    <button class="nav-item" data-url="https://nizrih2.wpcomstaging.com/communities/" onclick="navigate(this)">
+    <button class="nav-item" data-page="communities" onclick="navTo('communities', this)">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
       <span>קהילות</span>
     </button>
-    <button class="nav-item" data-url="https://nizrih2.wpcomstaging.com/quiz/" onclick="navigate(this)">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg>
-      <span>שאלון</span>
+    <button class="nav-item" data-page="guides" onclick="navTo('guides', this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 5c-1.11-.35-2.33-.5-3.5-.5-1.95 0-4.05.4-5.5 1.5-1.45-1.1-3.55-1.5-5.5-1.5S2.45 4.9 1 6v14.65c0 .25.25.5.5.5.1 0 .15-.05.25-.05C3.1 20.45 5.05 20 6.5 20c1.95 0 4.05.4 5.5 1.5 1.35-.85 3.8-1.5 5.5-1.5 1.65 0 3.35.3 4.75 1.05.1.05.15.05.25.05.25 0 .5-.25.5-.5V6c-.6-.45-1.25-.75-2-1zm0 13.5c-1.1-.35-2.3-.5-3.5-.5-1.7 0-4.15.65-5.5 1.5V8c1.35-.85 3.8-1.5 5.5-1.5 1.2 0 2.4.15 3.5.5v11.5z"/></svg>
+      <span>מדריכים</span>
     </button>
-    <button class="nav-item" data-url="https://nizrih2.wpcomstaging.com/projects/" onclick="navigate(this)">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M1 11v10h6v-5h2v5h6V11L8 6l-7 5zm12 8h-2v-5H5v5H3v-7l5-3.5 5 3.5v7zm4-12.5h2V9h-2V6.5zm0 4h2V19h-2V10.5zm4-6h2V9h-2V4.5zm0 6h2V19h-2V10.5z"/></svg>
-      <span>פרויקטים</span>
+    <button class="nav-item" data-page="blog" onclick="navTo('blog', this)">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+      <span>בלוג</span>
     </button>
-    <button class="nav-item" data-url="https://nizrih2.wpcomstaging.com/contact/" onclick="navigate(this)">
+    <button class="nav-item" data-page="contact" onclick="navTo('contact', this)">
       <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
       <span>צור קשר</span>
     </button>
   </div>
 
   <script>
-    const frame = document.getElementById('app-frame');
+    const API = 'https://nizrih2.wpcomstaging.com/wp-json/wp/v2';
+    const SITE = 'https://nizrih2.wpcomstaging.com';
+    const content = document.getElementById('content');
+    const loading = document.getElementById('loading');
     const splash = document.getElementById('splash');
+    const backBtn = document.getElementById('back-btn');
+    const headerTitle = document.getElementById('header-title');
     const navItems = document.querySelectorAll('.nav-item');
-    const bottomNav = document.getElementById('bottom-nav');
 
-    // Adjust iframe height for bottom nav
-    function adjustHeight() {
-      const navHeight = bottomNav.offsetHeight;
-      document.getElementById('webview-container').style.bottom = navHeight + 'px';
+    let history = [];
+    let cache = {};
+
+    // ===== API HELPERS =====
+    async function apiFetch(endpoint) {
+      if (cache[endpoint]) return cache[endpoint];
+      const res = await fetch(API + endpoint);
+      if (!res.ok) throw new Error('API error');
+      const data = await res.json();
+      cache[endpoint] = data;
+      return data;
     }
 
-    // Hide splash when loaded
-    frame.addEventListener('load', () => {
-      setTimeout(() => {
-        splash.classList.add('hidden');
-        adjustHeight();
-      }, 800);
+    async function fetchMedia(id) {
+      if (!id || id === 0) return null;
+      try {
+        const m = await apiFetch('/media/' + id);
+        return m.source_url;
+      } catch { return null; }
+    }
+
+    function showLoading() { loading.classList.add('show'); content.innerHTML = ''; }
+    function hideLoading() { loading.classList.remove('show'); }
+
+    function setTitle(t) {
+      headerTitle.innerHTML = '<h1>' + t + '</h1>';
+    }
+
+    function updateBack() {
+      backBtn.classList.toggle('visible', history.length > 0);
+    }
+
+    function goBack() {
+      if (history.length > 0) {
+        const prev = history.pop();
+        updateBack();
+        prev();
+      }
+    }
+
+    function stripHtml(html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      return tmp.textContent || '';
+    }
+
+    function scrollTop() {
+      document.getElementById('main').scrollTo(0, 0);
+    }
+
+    // ===== NAVIGATION =====
+    function navTo(page, el) {
+      history = [];
+      updateBack();
+      navItems.forEach(n => n.classList.remove('active'));
+      if (el) el.classList.add('active');
+
+      switch(page) {
+        case 'home': loadHome(); break;
+        case 'communities': loadCommunities(); break;
+        case 'guides': loadGuides(); break;
+        case 'blog': loadBlog(); break;
+        case 'contact': loadContact(); break;
+      }
+    }
+
+    // ===== HOME PAGE =====
+    async function loadHome() {
+      setTitle('הבית הבא');
+      showLoading();
+      scrollTop();
+      try {
+        const [posts, pages] = await Promise.all([
+          apiFetch('/posts?per_page=6&_embed'),
+          apiFetch('/pages?per_page=50&_fields=id,title,slug,link,featured_media,excerpt,parent')
+        ]);
+
+        let html = `
+          <div class="hero">
+            <h2>מצא את הקהילה המושלמת</h2>
+            <p>מנוע התאמה קהילתי-דתי למשפחות המחפשות את הבית הבא שלהן בישראל</p>
+            <button class="hero-btn" onclick="navTo('communities', document.querySelector('[data-page=communities]'))">גלה קהילות</button>
+          </div>
+        `;
+
+        // Guide pages (filter community/city guides)
+        const guides = pages.filter(p => {
+          const t = p.title.rendered.toLowerCase();
+          return t.includes('guide') || t.includes('מדריך');
+        }).slice(0, 6);
+
+        if (guides.length > 0) {
+          html += '<div class="section-title">מדריכים מומלצים</div><div class="h-scroll">';
+          for (const g of guides) {
+            const img = g.featured_media ? await fetchMedia(g.featured_media) : null;
+            const excerpt = stripHtml(g.excerpt?.rendered || '');
+            html += `
+              <div class="h-card" onclick="openPage(${g.id})">
+                ${img ? '<img class="h-card-img" src="' + img + '" alt="">' : '<div class="h-card-img" style="background:linear-gradient(135deg,#1B3F6B,#2a5a9a);display:flex;align-items:center;justify-content:center;color:white;font-size:32px;">📖</div>'}
+                <div class="h-card-body">
+                  <h4>${g.title.rendered}</h4>
+                  <p>${excerpt}</p>
+                </div>
+              </div>`;
+          }
+          html += '</div>';
+        }
+
+        // Recent posts
+        if (posts.length > 0) {
+          html += '<div class="section-title">מאמרים אחרונים</div><div class="cards">';
+          for (const post of posts) {
+            const img = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+            const excerpt = stripHtml(post.excerpt?.rendered || '');
+            html += `
+              <div class="card" onclick="openPost(${post.id})">
+                ${img ? '<img class="card-img" src="' + img + '" alt="">' : ''}
+                <div class="card-body">
+                  <h3>${post.title.rendered}</h3>
+                  <p>${excerpt}</p>
+                </div>
+              </div>`;
+          }
+          html += '</div>';
+        }
+
+        // All pages as quick links
+        const otherPages = pages.filter(p => !guides.includes(p)).slice(0, 10);
+        if (otherPages.length > 0) {
+          html += '<div class="section-title">עמודים נוספים</div><div class="cards">';
+          for (const p of otherPages) {
+            html += `
+              <div class="card" onclick="openPage(${p.id})">
+                <div class="card-body">
+                  <h3>${p.title.rendered}</h3>
+                  <p>${stripHtml(p.excerpt?.rendered || '')}</p>
+                </div>
+              </div>`;
+          }
+          html += '</div>';
+        }
+
+        content.innerHTML = html;
+      } catch(e) {
+        content.innerHTML = `<div class="error-state"><h3>שגיאה בטעינה</h3><p>${e.message}</p><button onclick="loadHome()">נסה שוב</button></div>`;
+      }
+      hideLoading();
+    }
+
+    // ===== COMMUNITIES PAGE =====
+    async function loadCommunities() {
+      setTitle('קהילות');
+      showLoading();
+      scrollTop();
+      try {
+        const pages = await apiFetch('/pages?per_page=50&_fields=id,title,slug,link,featured_media,excerpt,parent');
+        const communityPages = pages.filter(p => {
+          const t = p.title.rendered.toLowerCase();
+          return t.includes('communit') || t.includes('קהיל') || t.includes('guide') ||
+                 t.includes('jerusalem') || t.includes('ירושלים') || t.includes('modiin') ||
+                 t.includes('מודיעין') || t.includes('beit shemesh') || t.includes('בית שמש') ||
+                 t.includes('haifa') || t.includes('חיפה');
+        });
+
+        let html = '<div class="section-title">קהילות ואזורים</div><div class="cards">';
+        for (const p of (communityPages.length ? communityPages : pages.slice(0, 15))) {
+          const excerpt = stripHtml(p.excerpt?.rendered || '');
+          html += `
+            <div class="card" onclick="openPage(${p.id})">
+              <div class="card-body">
+                <h3>${p.title.rendered}</h3>
+                <p>${excerpt}</p>
+                <span class="card-tag">קרא עוד ←</span>
+              </div>
+            </div>`;
+        }
+        html += '</div>';
+        content.innerHTML = html;
+      } catch(e) {
+        content.innerHTML = `<div class="error-state"><h3>שגיאה בטעינה</h3><button onclick="loadCommunities()">נסה שוב</button></div>`;
+      }
+      hideLoading();
+    }
+
+    // ===== GUIDES PAGE =====
+    async function loadGuides() {
+      setTitle('מדריכים');
+      showLoading();
+      scrollTop();
+      try {
+        const pages = await apiFetch('/pages?per_page=50&_fields=id,title,slug,link,featured_media,excerpt');
+        const guides = pages.filter(p => {
+          const t = p.title.rendered.toLowerCase();
+          return t.includes('guide') || t.includes('מדריך') || t.includes('kosher') ||
+                 t.includes('כשר') || t.includes('aliyah') || t.includes('עליי') ||
+                 t.includes('education') || t.includes('חינוך') || t.includes('housing') ||
+                 t.includes('דיור') || t.includes('synagogue') || t.includes('בתי כנסת') ||
+                 t.includes('מקוו');
+        });
+
+        let html = '<div class="section-title">מדריכים</div><div class="cards">';
+        for (const p of (guides.length ? guides : pages.slice(0, 15))) {
+          html += `
+            <div class="card" onclick="openPage(${p.id})">
+              <div class="card-body">
+                <h3>${p.title.rendered}</h3>
+                <p>${stripHtml(p.excerpt?.rendered || '')}</p>
+                <span class="card-tag">קרא עוד ←</span>
+              </div>
+            </div>`;
+        }
+        html += '</div>';
+        content.innerHTML = html;
+      } catch(e) {
+        content.innerHTML = `<div class="error-state"><h3>שגיאה בטעינה</h3><button onclick="loadGuides()">נסה שוב</button></div>`;
+      }
+      hideLoading();
+    }
+
+    // ===== BLOG PAGE =====
+    async function loadBlog() {
+      setTitle('בלוג');
+      showLoading();
+      scrollTop();
+      try {
+        const posts = await apiFetch('/posts?per_page=20&_embed');
+        let html = '<div class="section-title">מאמרים</div><div class="cards">';
+        for (const post of posts) {
+          const img = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+          const excerpt = stripHtml(post.excerpt?.rendered || '');
+          const date = new Date(post.date).toLocaleDateString('he-IL');
+          html += `
+            <div class="card" onclick="openPost(${post.id})">
+              ${img ? '<img class="card-img" src="' + img + '" alt="">' : ''}
+              <div class="card-body">
+                <h3>${post.title.rendered}</h3>
+                <p>${excerpt}</p>
+                <span class="card-tag">${date}</span>
+              </div>
+            </div>`;
+        }
+        html += '</div>';
+        content.innerHTML = html;
+      } catch(e) {
+        content.innerHTML = `<div class="error-state"><h3>שגיאה בטעינה</h3><button onclick="loadBlog()">נסה שוב</button></div>`;
+      }
+      hideLoading();
+    }
+
+    // ===== CONTACT PAGE =====
+    function loadContact() {
+      setTitle('צור קשר');
+      scrollTop();
+      content.innerHTML = `
+        <div class="hero">
+          <h2>צור קשר</h2>
+          <p>נשמח לשמוע ממך! שלח לנו הודעה ונחזור אליך בהקדם</p>
+        </div>
+        <div style="padding:20px 16px;">
+          <div style="background:white;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
+            <div style="margin-bottom:16px;">
+              <label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px;">שם מלא</label>
+              <input id="c-name" type="text" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:15px;" placeholder="הכנס שם מלא">
+            </div>
+            <div style="margin-bottom:16px;">
+              <label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px;">אימייל</label>
+              <input id="c-email" type="email" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:15px;" dir="ltr" placeholder="email@example.com">
+            </div>
+            <div style="margin-bottom:16px;">
+              <label style="display:block;font-size:14px;font-weight:600;margin-bottom:6px;">הודעה</label>
+              <textarea id="c-msg" rows="5" style="width:100%;padding:12px;border:1px solid #ddd;border-radius:8px;font-size:15px;resize:vertical;" placeholder="כתוב את ההודעה שלך..."></textarea>
+            </div>
+            <button onclick="sendContact()" style="width:100%;padding:14px;background:var(--primary);color:white;border:none;border-radius:8px;font-size:16px;font-weight:600;cursor:pointer;">שלח הודעה</button>
+          </div>
+          <div style="text-align:center;margin-top:24px;padding:20px;">
+            <p style="font-size:14px;color:var(--text-light);margin-bottom:12px;">או בקר באתר שלנו:</p>
+            <a href="${SITE}" target="_blank" style="color:var(--primary);font-weight:600;">${SITE.replace('https://','')}</a>
+          </div>
+        </div>`;
+      hideLoading();
+    }
+
+    function sendContact() {
+      const name = document.getElementById('c-name').value;
+      const email = document.getElementById('c-email').value;
+      const msg = document.getElementById('c-msg').value;
+      if (!name || !email || !msg) { alert('נא למלא את כל השדות'); return; }
+      const mailto = 'mailto:info@habait-haba.com?subject=' +
+        encodeURIComponent('פנייה מ-' + name) +
+        '&body=' + encodeURIComponent(msg + '\n\nמאת: ' + name + '\nאימייל: ' + email);
+      window.location.href = mailto;
+    }
+
+    // ===== DETAIL VIEWS =====
+    async function openPost(id) {
+      const current = content.innerHTML;
+      const currentTitle = headerTitle.innerHTML;
+      history.push(() => { content.innerHTML = current; headerTitle.innerHTML = currentTitle; updateBack(); hideLoading(); });
+      updateBack();
+      showLoading();
+      scrollTop();
+      try {
+        const post = await apiFetch('/posts/' + id + '?_embed');
+        const img = post._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+        setTitle(stripHtml(post.title.rendered).substring(0, 25) + '...');
+        let html = '';
+        if (img) html += '<img class="detail-hero" src="' + img + '" alt="">';
+        html += '<div class="detail-content">';
+        html += '<h1>' + post.title.rendered + '</h1>';
+        html += '<p style="color:var(--text-light);font-size:13px;margin-bottom:16px;">' + new Date(post.date).toLocaleDateString('he-IL') + '</p>';
+        html += processContent(post.content.rendered);
+        html += '</div>';
+        content.innerHTML = html;
+      } catch(e) {
+        content.innerHTML = `<div class="error-state"><h3>שגיאה בטעינה</h3><button onclick="goBack()">חזור</button></div>`;
+      }
+      hideLoading();
+    }
+
+    async function openPage(id) {
+      const current = content.innerHTML;
+      const currentTitle = headerTitle.innerHTML;
+      history.push(() => { content.innerHTML = current; headerTitle.innerHTML = currentTitle; updateBack(); hideLoading(); });
+      updateBack();
+      showLoading();
+      scrollTop();
+      try {
+        const page = await apiFetch('/pages/' + id + '?_embed');
+        const img = page._embedded?.['wp:featuredmedia']?.[0]?.source_url;
+        setTitle(stripHtml(page.title.rendered).substring(0, 25));
+        let html = '';
+        if (img) html += '<img class="detail-hero" src="' + img + '" alt="">';
+        html += '<div class="detail-content">';
+        html += '<h1>' + page.title.rendered + '</h1>';
+        html += processContent(page.content.rendered);
+        html += '</div>';
+        content.innerHTML = html;
+      } catch(e) {
+        content.innerHTML = `<div class="error-state"><h3>שגיאה בטעינה</h3><button onclick="goBack()">חזור</button></div>`;
+      }
+      hideLoading();
+    }
+
+    // Process WordPress content - convert internal links to app navigation
+    function processContent(html) {
+      const div = document.createElement('div');
+      div.innerHTML = html;
+
+      // Convert internal links to onclick handlers
+      div.querySelectorAll('a').forEach(a => {
+        const href = a.getAttribute('href') || '';
+        if (href.includes('nizrih2.wpcomstaging.com')) {
+          a.removeAttribute('href');
+          a.style.cursor = 'pointer';
+          a.setAttribute('onclick', "handleInternalLink('" + href.replace(/'/g, "\\'") + "')");
+        } else if (href.startsWith('/')) {
+          a.removeAttribute('href');
+          a.style.cursor = 'pointer';
+          a.setAttribute('onclick', "handleInternalLink('" + SITE + href.replace(/'/g, "\\'") + "')");
+        }
+      });
+
+      return div.innerHTML;
+    }
+
+    // Handle internal link clicks
+    async function handleInternalLink(url) {
+      showLoading();
+      try {
+        // Try to find matching page/post by slug
+        const urlPath = new URL(url).pathname.replace(/\/$/, '');
+        const slug = urlPath.split('/').filter(Boolean).pop();
+
+        if (slug) {
+          // Try pages first
+          let items = await apiFetch('/pages?slug=' + slug + '&_embed');
+          if (items.length > 0) {
+            openPage(items[0].id);
+            return;
+          }
+          // Try posts
+          items = await apiFetch('/posts?slug=' + slug + '&_embed');
+          if (items.length > 0) {
+            openPost(items[0].id);
+            return;
+          }
+        }
+        // Fallback: open in browser
+        window.open(url, '_blank');
+      } catch {
+        window.open(url, '_blank');
+      }
+      hideLoading();
+    }
+
+    function refreshPage() {
+      cache = {};
+      const activeNav = document.querySelector('.nav-item.active');
+      if (activeNav) navTo(activeNav.dataset.page, activeNav);
+    }
+
+    // ===== INIT =====
+    loadHome().then(() => {
+      setTimeout(() => splash.classList.add('hidden'), 600);
     });
-
-    // Fallback: hide splash after 5s
-    setTimeout(() => {
-      splash.classList.add('hidden');
-      adjustHeight();
-    }, 5000);
-
-    // Navigation
-    function navigate(el) {
-      const url = el.dataset.url;
-      frame.src = url;
-
-      // Update active state
-      navItems.forEach(item => item.classList.remove('active'));
-      el.classList.add('active');
-
-      // Show splash briefly
-      splash.classList.remove('hidden');
-    }
 
     // Register service worker
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').then(() => {
-        console.log('Service Worker registered');
-      });
+      navigator.serviceWorker.register('sw.js').catch(() => {});
     }
-
-    // Adjust on resize
-    window.addEventListener('resize', adjustHeight);
-    adjustHeight();
   </script>
 </body>
 </html>
