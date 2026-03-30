@@ -1,13 +1,14 @@
-const CACHE_NAME = 'habait-haba-v1';
-const OFFLINE_URL = '/offline.html';
+const CACHE_NAME = 'habait-haba-v2';
+const BASE = '/habait-haba-pwa';
+const OFFLINE_URL = BASE + '/offline.html';
 
 const PRECACHE_URLS = [
-  '/',
-  '/index.html',
-  '/offline.html',
-  '/manifest.json',
-  '/icons/icon-192x192.png',
-  '/icons/icon-512x512.png'
+  BASE + '/',
+  BASE + '/index.html',
+  BASE + '/offline.html',
+  BASE + '/manifest.json',
+  BASE + '/icons/icon-192x192.png',
+  BASE + '/icons/icon-512x512.png'
 ];
 
 self.addEventListener('install', (event) => {
